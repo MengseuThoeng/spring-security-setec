@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - SpringSec</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8f9fa;
+            color: #333;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 250px;
+            height: 100vh;
+            background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 2rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 1rem 0;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.1);
+            border-right: 3px solid #3498db;
+        }
+
+        .sidebar-menu i {
+            margin-right: 1rem;
+            width: 20px;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+        }
+
+        .topbar {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .content {
+            padding: 2rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .stat-icon.users { background: linear-gradient(45deg, #3498db, #2980b9); }
+        .stat-icon.security { background: linear-gradient(45deg, #e74c3c, #c0392b); }
+        .stat-icon.performance { background: linear-gradient(45deg, #2ecc71, #27ae60); }
+        .stat-icon.sessions { background: linear-gradient(45deg, #f39c12, #e67e22); }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2><i class="fas fa-shield-alt"></i> SpringSec</h2>
+            <p>Admin Dashboard</p>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="#dashboard" class="active" data-section="dashboard"><i class="fas fa-tachometer-alt"></i>Dashboard</a></li>
+            <li><a href="#users" data-section="users"><i class="fas fa-users"></i>Users</a></li>
+            <li><a href="#security" data-section="security"><i class="fas fa-shield-alt"></i>Security</a></li>
+            <li><a href="#logs" data-section="logs"><i class="fas fa-file-alt"></i>Logs</a></li>
+            <li><a href="#settings" data-section="settings"><i class="fas fa-cog"></i>Settings</a></li>
+            <li><a href="/home"><i class="fas fa-home"></i>Back to Home</a></li>
+            <li><a href="/logout"><i class="fas fa-logout "></i>Logout</a></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <div class="topbar">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h1>Admin Dashboard</h1>
+            <div class="user-info">
+                <div class="user-avatar">A</div>
+                <span>Administrator</span>
+                <a href="/home" class="btn btn-secondary">Back to Home</a>
+            </div>
+        </div>
+
+        <div class="content">
+            <div id="dashboard-section">
+                <h2 style="font-size: 2rem; margin-bottom: 2rem; color: #2c3e50;">Dashboard Overview</h2>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div>
+                                <div class="stat-value">1,234</div>
+                                <div style="color: #7f8c8d; font-size: 0.9rem;">Total Users</div>
+                            </div>
+                            <div class="stat-icon users">
+                                <i class="fas fa-users"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div>
+                                <div class="stat-value">89</div>
+                                <div style="color: #7f8c8d; font-size: 0.9rem;">Security Events</div>
+                            </div>
+                            <div class="stat-icon security">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div>
+                                <div class="stat-value">99.8%</div>
+                                <div style="color: #7f8c8d; font-size: 0.9rem;">System Uptime</div>
+                            </div>
+                            <div class="stat-icon performance">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <div>
+                                <div class="stat-value">567</div>
+                                <div style="color: #7f8c8d; font-size: 0.9rem;">Active Sessions</div>
+                            </div>
+                            <div class="stat-icon sessions">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background: white; padding: 1.5rem; border-radius: 10px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); margin-bottom: 2rem;">
+                    <h3 style="margin-bottom: 1rem; color: #2c3e50;">Recent Activity</h3>
+                    <div style="display: flex; align-items: center; padding: 1rem 0; border-bottom: 1px solid #eee;">
+                        <div style="width: 40px; height: 40px; border-radius: 50%; background: rgba(52, 152, 219, 0.1); color: #3498db; display: flex; align-items: center; justify-content: center; margin-right: 1rem;">
+                            <i class="fas fa-sign-in-alt"></i>
+                        </div>
+                        <div>
+                            <div style="font-weight: 500;">New user registration</div>
+                            <div style="font-size: 0.8rem; color: #7f8c8d;">2 minutes ago</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; padding: 1rem 0; border-bottom: 1px solid #eee;">
+                        <div style="width: 40px; height: 40px; border-radius: 50%; background: rgba(231, 76, 60, 0.1); color: #e74c3c; display: flex; align-items: center; justify-content: center; margin-right: 1rem;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div>
+                            <div style="font-weight: 500;">Failed login attempt detected</div>
+                            <div style="font-size: 0.8rem; color: #7f8c8d;">15 minutes ago</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="users-section" style="display: none;">
+                <h2 style="font-size: 2rem; margin-bottom: 2rem; color: #2c3e50;">User Management</h2>
+                <p style="margin-bottom: 1rem;">Manage system users, roles, and permissions.</p>
+                <button class="btn btn-primary">Add New User</button>
+            </div>
+
+            <div id="security-section" style="display: none;">
+                <h2 style="font-size: 2rem; margin-bottom: 2rem; color: #2c3e50;">Security Center</h2>
+                <p style="margin-bottom: 1rem;">Monitor security events and configure security settings.</p>
+                <button class="btn btn-primary">View Security Logs</button>
+            </div>
+
+            <div id="logs-section" style="display: none;">
+                <h2 style="font-size: 2rem; margin-bottom: 2rem; color: #2c3e50;">System Logs</h2>
+                <p style="margin-bottom: 1rem;">View and analyze system logs and audit trails.</p>
+                <button class="btn btn-primary">Download Logs</button>
+            </div>
+
+            <div id="settings-section" style="display: none;">
+                <h2 style="font-size: 2rem; margin-bottom: 2rem; color: #2c3e50;">System Settings</h2>
+                <p style="margin-bottom: 1rem;">Configure system-wide settings and preferences.</p>
+                <button class="btn btn-primary">Save Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mobile menu toggle
+        document.getElementById('menuToggle').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('active');
+        });
+
+        // Section navigation
+        document.querySelectorAll('.sidebar-menu a[data-section]').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+
+                // Update active menu item
+                document.querySelectorAll('.sidebar-menu a').forEach(a => a.classList.remove('active'));
+                this.classList.add('active');
+
+                // Show selected section
+                const sectionId = this.getAttribute('data-section') + '-section';
+                document.querySelectorAll('[id$="-section"]').forEach(section => {
+                    section.style.display = 'none';
+                });
+                document.getElementById(sectionId).style.display = 'block';
+            });
+        });
+
+        // Simulate real-time updates
+        function updateStats() {
+            const stats = [
+                Math.floor(Math.random() * 100) + 1200,
+                Math.floor(Math.random() * 20) + 80,
+                (99.5 + Math.random() * 0.5).toFixed(1) + '%',
+                Math.floor(Math.random() * 100) + 500
+            ];
+
+            const statValues = document.querySelectorAll('.stat-value');
+            statValues.forEach((stat, index) => {
+                if (stats[index]) {
+                    stat.textContent = stats[index];
+                }
+            });
+        }
+
+        // Update stats every 30 seconds
+        setInterval(updateStats, 30000);
+
+        // Initialize page with fade-in effect
+        document.addEventListener('DOMContentLoaded', function() {
+            document.body.style.opacity = '0';
+            document.body.style.transition = 'opacity 0.5s ease';
+            setTimeout(() => {
+                document.body.style.opacity = '1';
+            }, 100);
+        });
+    </script>
+</body>
+</html>
