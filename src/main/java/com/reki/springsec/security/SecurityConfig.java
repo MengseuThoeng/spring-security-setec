@@ -15,19 +15,19 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    @Bean
-    public UserDetailsService userDetailsService() {
-        var user = User.withUsername("user")
-                .password("{noop}123456")
-                .roles("USER").build();
-
-        var admin = User.withUsername("admin")
-                .password("{noop}123}")
-                .roles("ADMIN").build();
-
-
-        return new InMemoryUserDetailsManager(user, admin);
-    }
+//    @Bean
+//    public UserDetailsService userDetailsService() {
+//        var user = User.withUsername("user")
+//                .password("{noop}123456")
+//                .roles("USER").build();
+//
+//        var admin = User.withUsername("admin")
+//                .password("{noop}123}")
+//                .roles("ADMIN").build();
+//
+//
+//        return new InMemoryUserDetailsManager(user, admin);
+//    }
 
 
 
@@ -36,13 +36,18 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(
                         auth -> auth
-//                                .requestMatchers("/", "/home").permitAll()
-//                                .requestMatchers("/admin").hasRole("ADMIN")
-                                .anyRequest().permitAll()
-
-                );
-
-        http.formLogin(Customizer.withDefaults()).logout(Customizer.withDefaults());
+                                .requestMatchers("/", "/home", "/login", "/css/**", "/js/**", "/images/**").permitAll()
+                                .requestMatchers("/admin").hasRole("ADMIN")
+                                .anyRequest().authenticated()
+                )
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .loginProcessingUrl("/login")
+                        .defaultSuccessUrl("/default", true)
+                        .failureUrl("/login?error=true")
+                        .permitAll()
+                )
+                .logout(Customizer.withDefaults());
 
         return http.build();
     }
