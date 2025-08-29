@@ -79,7 +79,6 @@
                         <span class="text-gray-800 font-medium" sec:authentication="name">Administrator</span>
                     </div>
                     <form action="/logout" method="post" class="inline">
-                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                         <button type="submit" class="flex items-center space-x-1 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-all transform hover:scale-105">
                             <i class="fas fa-sign-out-alt"></i>
                             <span>Logout</span>

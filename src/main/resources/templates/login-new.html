@@ -60,9 +60,6 @@
             </div>
 
             <form action="/login" method="post" class="space-y-6">
-                <!-- CSRF Token -->
-                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-                
                 <!-- Username Field -->
                 <div class="space-y-2">
                     <label class="flex items-center text-lg font-semibold text-gray-700" for="username">
@@ -116,12 +113,12 @@
                     <div class="bg-blue-50 p-4 rounded-xl border border-blue-200">
                         <h4 class="font-semibold text-blue-800 mb-2">Admin Access</h4>
                         <p class="text-blue-700"><strong>Username:</strong> admin</p>
-                        <p class="text-blue-700"><strong>Password:</strong> admin</p>
+                        <p class="text-blue-700"><strong>Password:</strong> admin123</p>
                     </div>
                     <div class="bg-green-50 p-4 rounded-xl border border-green-200">
                         <h4 class="font-semibold text-green-800 mb-2">User Access</h4>
                         <p class="text-green-700"><strong>Username:</strong> user</p>
-                        <p class="text-green-700"><strong>Password:</strong> 123</p>
+                        <p class="text-green-700"><strong>Password:</strong> user123</p>
                     </div>
                 </div>
             </div>

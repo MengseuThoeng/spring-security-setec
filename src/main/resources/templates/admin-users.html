@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management - Admin Panel</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#667eea',
+                        secondary: '#764ba2'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .bg-gradient-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .glass-effect { backdrop-filter: blur(16px); background: rgba(255, 255, 255, 0.95); }
+    </style>
+</head>
+<body class="bg-gradient-primary min-h-screen">
+    <!-- Navigation -->
+    <nav class="glass-effect border-b border-white/20 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="/admin" class="flex items-center space-x-2 text-gray-800 hover:text-primary transition-colors">
+                        <i class="fas fa-users-cog text-2xl text-primary"></i>
+                        <span class="text-xl font-bold">User Management</span>
+                    </a>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <a href="/admin" class="flex items-center space-x-1 px-3 py-2 rounded-lg text-gray-700 hover:bg-white/20 transition-all">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="/admin/users" class="flex items-center space-x-1 px-3 py-2 rounded-lg bg-primary text-white">
+                        <i class="fas fa-users"></i>
+                        <span>Users</span>
+                    </a>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <span class="bg-gradient-to-r from-red-500 to-pink-500 text-white px-3 py-1 rounded-full text-xs font-bold uppercase">Admin</span>
+                    <div class="w-8 h-8 bg-gradient-to-r from-primary to-secondary rounded-full flex items-center justify-center text-white font-bold">
+                        <span th:text="${#authentication.name.substring(0,1).toUpperCase()}">A</span>
+                    </div>
+                    <span class="text-gray-800 font-medium" sec:authentication="name">Administrator</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Success/Error Messages -->
+        <div th:if="${successMessage}" class="mb-6 p-4 rounded-xl bg-green-100 border border-green-400 text-green-700">
+            <div class="flex items-center">
+                <i class="fas fa-check-circle mr-2"></i>
+                <span th:text="${successMessage}"></span>
+            </div>
+        </div>
+        
+        <div th:if="${errorMessage}" class="mb-6 p-4 rounded-xl bg-red-100 border border-red-400 text-red-700">
+            <div class="flex items-center">
+                <i class="fas fa-exclamation-circle mr-2"></i>
+                <span th:text="${errorMessage}"></span>
+            </div>
+        </div>
+        
+        <!-- Header -->
+        <div class="glass-effect rounded-3xl p-8 mb-8 text-center shadow-xl">
+            <h1 class="text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-4">
+                User Management
+            </h1>
+            <p class="text-gray-600 text-lg">Manage system users and their permissions</p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="glass-effect rounded-2xl p-6 mb-8 shadow-xl">
+            <div class="flex flex-wrap gap-4">
+                <a th:href="@{/admin/users/create}" class="flex items-center space-x-2 bg-gradient-to-r from-primary to-secondary text-white px-6 py-3 rounded-xl font-medium hover:shadow-lg transform hover:scale-105 transition-all">
+                    <i class="fas fa-user-plus"></i>
+                    <span>Create New User</span>
+                </a>
+                <a th:href="@{/admin}" class="flex items-center space-x-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white px-6 py-3 rounded-xl font-medium hover:shadow-lg transform hover:scale-105 transition-all">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Back to Dashboard</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Users Table -->
+        <div class="glass-effect rounded-3xl p-8 shadow-xl">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b-2 border-gray-200">
+                            <th class="text-left py-4 px-6 font-bold text-gray-700 text-lg">
+                                <i class="fas fa-hashtag mr-2 text-primary"></i>ID
+                            </th>
+                            <th class="text-left py-4 px-6 font-bold text-gray-700 text-lg">
+                                <i class="fas fa-user mr-2 text-primary"></i>Username
+                            </th>
+                            <th class="text-left py-4 px-6 font-bold text-gray-700 text-lg">
+                                <i class="fas fa-shield-alt mr-2 text-primary"></i>Roles
+                            </th>
+                            <th class="text-left py-4 px-6 font-bold text-gray-700 text-lg">
+                                <i class="fas fa-cogs mr-2 text-primary"></i>Actions
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="user : ${users}" class="border-b border-gray-100 hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 transition-all duration-200">
+                            <td class="py-6 px-6 text-gray-800 font-medium text-lg" th:text="${user.id}"></td>
+                            <td class="py-6 px-6 text-gray-800 font-semibold text-lg" th:text="${user.username}"></td>
+                            <td class="py-6 px-6">
+                                <div class="flex flex-wrap gap-2">
+                                    <span th:each="role : ${user.roles}" class="inline-block bg-gradient-to-r from-primary to-secondary text-white px-4 py-2 rounded-full text-sm font-bold uppercase tracking-wide shadow-lg" th:text="${role.name}"></span>
+                                </div>
+                            </td>
+                            <td class="py-6 px-6">
+                                <div class="flex space-x-3">
+                                    <a th:href="@{'/admin/users/edit/' + ${user.id}}" class="flex items-center space-x-2 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-all transform hover:scale-105 shadow-lg">
+                                        <i class="fas fa-edit"></i>
+                                        <span>Edit</span>
+                                    </a>
+                                    
+                                    <!-- Show disabled delete button for current user -->
+                                    <div th:if="${user.username == #authentication.name}" class="flex items-center space-x-2 bg-gray-400 text-white px-4 py-2 rounded-lg font-medium shadow-lg cursor-not-allowed" title="You cannot delete your own account">
+                                        <i class="fas fa-trash"></i>
+                                        <span>Delete</span>
+                                        <span class="text-xs">(Self)</span>
+                                    </div>
+                                    
+                                    <!-- Show normal delete button for other users -->
+                                    <form th:if="${user.username != #authentication.name}" th:action="@{'/admin/users/delete/' + ${user.id}}" method="post" class="inline">
+                                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                                        <button type="submit" class="flex items-center space-x-2 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-4 py-2 rounded-lg font-medium transition-all transform hover:scale-105 shadow-lg" onclick="return confirm('Are you sure you want to delete this user?')">
+                                            <i class="fas fa-trash"></i>
+                                            <span>Delete</span>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <!-- Empty State -->
+                <div th:if="${#lists.isEmpty(users)}" class="text-center py-12">
+                    <i class="fas fa-users text-6xl text-gray-300 mb-4"></i>
+                    <h3 class="text-xl font-semibold text-gray-600 mb-2">No users found</h3>
+                    <p class="text-gray-500 mb-6">Get started by creating your first user</p>
+                    <a th:href="@{/admin/users/create}" class="inline-flex items-center space-x-2 bg-gradient-to-r from-primary to-secondary text-white px-6 py-3 rounded-xl font-medium hover:shadow-lg transform hover:scale-105 transition-all">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Create First User</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

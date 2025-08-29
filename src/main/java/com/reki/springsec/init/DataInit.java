@@ -25,31 +25,39 @@ public class DataInit {
 
 
         if (roleRepository.count() == 0 && userRepository.count() == 0) {
-            // Create roles
-            Role userR = Role.builder()
+            // Create and save roles first
+            Role userRole = Role.builder()
                     .name("USER")
                     .build();
-            Role adminR = Role.builder()
+            Role adminRole = Role.builder()
                     .name("ADMIN")
                     .build();
 
-            // Save roles first
-            roleRepository.saveAll(List.of(userR, adminR));
+            // Save roles and get persisted entities with IDs
+            List<Role> savedRoles = roleRepository.saveAll(List.of(userRole, adminRole));
+            Role savedUserRole = savedRoles.stream()
+                    .filter(role -> "USER".equals(role.getName()))
+                    .findFirst()
+                    .orElse(userRole);
+            Role savedAdminRole = savedRoles.stream()
+                    .filter(role -> "ADMIN".equals(role.getName()))
+                    .findFirst()
+                    .orElse(adminRole);
 
-            // Now create users with the saved roles
+            // Now create users with the persisted roles
             User user = User.builder()
                     .username("user")
                     .password(passwordEncoder.encode("123"))
-                    .roles(List.of(userR))
+                    .roles(List.of(savedUserRole))
                     .build();
 
             User admin = User.builder()
                     .username("admin")
                     .password(passwordEncoder.encode("admin"))
-                    .roles(List.of(adminR))
+                    .roles(List.of(savedAdminRole))
                     .build();
 
-            // Save users after roles are persisted
+            // Save users
             userRepository.saveAll(List.of(user, admin));
         }
     }
